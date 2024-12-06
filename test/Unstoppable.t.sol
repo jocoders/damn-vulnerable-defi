@@ -56,14 +56,6 @@ contract UnstoppableTest is Test {
         uint256 balance = dvt.balanceOf(address(this));
         uint256 balanceVault = dvt.balanceOf(address(vault));
 
-        uint256 ASSET_TOTAL_VAULT = vault.totalAssets() / 1e18;
-        uint256 OWNER_SHARES = vault.balanceOf(OWNER) / 1e18;
-
-        console.log("--------------------------------");
-        console.log("ASSET_TOTAL_VAULT", ASSET_TOTAL_VAULT);
-        console.log("OWNER_SHARES", OWNER_SHARES);
-        console.log("--------------------------------");
-
         assertEq(balance, 10e18, "Address this should have 10 DVT");
         assertEq(balanceVault, DVT_INITIAL_SUPPLY - 10e18, "Vault should have 990 DVT");
 

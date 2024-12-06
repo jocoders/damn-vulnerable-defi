@@ -35,16 +35,11 @@ contract SetupContract {
         uint256 balance = dvt.balanceOf(address(this));
         uint256 balanceVault = dvt.balanceOf(address(vault));
 
-        // console.log('BALANCE_AFTER_TRANSFER', balance);
-        // console.log('BALANCE_VAULT', balanceVault);
-
         assert(balance == 10e18);
         assert(balanceVault == DVT_INITIAL_SUPPLY - 10e18);
     }
 
     function testCheckFlashLoan(uint256 amount, uint256 amountDeposit) public {
-        //require(amount <= 10e18, 'Amount must be less than 10 DVT');
-
         dvt.approve(address(vault), amountDeposit);
         vault.deposit(amountDeposit, address(this));
 

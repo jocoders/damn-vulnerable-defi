@@ -1,43 +1,40 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {WETH, NaiveReceiverPool} from "./NaiveReceiverPool.sol";
+import { IERC3156FlashBorrower } from '@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol';
+import { WETH, NaiveReceiverPool } from './NaiveReceiverPool.sol';
 
 contract FlashLoanReceiver is IERC3156FlashBorrower {
-    address private pool;
+  address private pool;
 
-    constructor(address _pool) {
-        pool = _pool;
+  constructor(address _pool) {
+    pool = _pool;
+  }
+
+  function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata) external returns (bytes32) {
+    assembly {
+      // gas savings
+      if iszero(eq(sload(pool.slot), caller())) {
+        mstore(0x00, 0x48f5c3ed)
+        revert(0x1c, 0x04)
+      }
     }
 
-    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata)
-        external
-        returns (bytes32)
-    {
-        assembly {
-            // gas savings
-            if iszero(eq(sload(pool.slot), caller())) {
-                mstore(0x00, 0x48f5c3ed)
-                revert(0x1c, 0x04)
-            }
-        }
+    if (token != address(NaiveReceiverPool(pool).weth())) revert NaiveReceiverPool.UnsupportedCurrency();
 
-        if (token != address(NaiveReceiverPool(pool).weth())) revert NaiveReceiverPool.UnsupportedCurrency();
-
-        uint256 amountToBeRepaid;
-        unchecked {
-            amountToBeRepaid = amount + fee;
-        }
-
-        _executeActionDuringFlashLoan();
-
-        // Return funds to pool
-        WETH(payable(token)).approve(pool, amountToBeRepaid);
-
-        return keccak256("ERC3156FlashBorrower.onFlashLoan");
+    uint256 amountToBeRepaid;
+    unchecked {
+      amountToBeRepaid = amount + fee;
     }
 
-    // Internal function where the funds received would be used
-    function _executeActionDuringFlashLoan() internal {}
+    _executeActionDuringFlashLoan();
+
+    // Return funds to pool
+    WETH(payable(token)).approve(pool, amountToBeRepaid);
+
+    return keccak256('ERC3156FlashBorrower.onFlashLoan');
+  }
+
+  // Internal function where the funds received would be used
+  function _executeActionDuringFlashLoan() internal {}
 }

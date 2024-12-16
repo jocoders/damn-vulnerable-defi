@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import {EIP712} from "@solady/utils/EIP712.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+import {console} from "forge-std/Test.sol";
 
 interface IHasTrustedForwarder {
     function trustedForwarder() external view returns (address);
@@ -44,7 +45,6 @@ contract BasicForwarder is EIP712 {
         if (request.value != msg.value) revert InvalidValue();
         if (block.timestamp > request.deadline) revert OldRequest();
         if (nonces[request.from] != request.nonce) revert InvalidNonce();
-
         if (IHasTrustedForwarder(request.target).trustedForwarder() != address(this)) revert InvalidTarget();
 
         address signer = ECDSA.recover(_hashTypedData(getDataHash(request)), signature);
@@ -61,6 +61,7 @@ contract BasicForwarder is EIP712 {
         address target = request.target;
         bytes memory payload = abi.encodePacked(request.data, request.from);
         uint256 forwardGas = request.gas;
+
         assembly {
             success := call(forwardGas, target, value, add(payload, 0x20), mload(payload), 0, 0) // don't copy returndata
             gasLeft := gas()

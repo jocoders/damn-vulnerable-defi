@@ -5,6 +5,7 @@ import {IERC3156FlashLender} from "@openzeppelin/contracts/interfaces/IERC3156Fl
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import {Multicall} from "./Multicall.sol";
 import {WETH} from "@solmate/src/tokens/WETH.sol";
+import {Test, console} from "forge-std/Test.sol";
 
 // There’s a pool with 1000 WETH in balance offering flash loans. It has a fixed fee of 1 WETH.
 // The pool supports meta-transactions by integrating with a permissionless forwarder contract.
@@ -50,7 +51,6 @@ contract NaiveReceiverPool is Multicall, IERC3156FlashLender {
     {
         if (token != address(weth)) revert UnsupportedCurrency();
 
-        // Transfer WETH and handle control to receiver
         weth.transfer(address(receiver), amount);
         totalDeposits -= amount;
 

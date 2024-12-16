@@ -47,6 +47,12 @@ contract NaiveReceive is Test {
 
         uint256 wethRecoverReceiverBalance = weth.balanceOf(recoverReceiver);
         assertEq(wethRecoverReceiverBalance, 1010 ether, "wethRecoverReceiverBalance should be 1010 ether");
+
+        uint256 poolWethBalance = weth.balanceOf(address(pool));
+        assertEq(poolWethBalance, 0 ether, "poolWethBalance should be 0 ether");
+
+        uint256 receiverWethBalance = weth.balanceOf(address(receiver));
+        assertEq(receiverWethBalance, 0 ether, "receiverWethBalance should be 0 ether");
     }
 
     function privateCreateSignData() private returns (BasicForwarder.Request memory request, bytes memory signature) {

